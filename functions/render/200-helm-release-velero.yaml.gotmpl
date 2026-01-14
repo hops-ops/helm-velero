@@ -1,0 +1,38 @@
+# code: language=yaml
+#
+# Helm release for Velero
+#
+
+{{- $v := $state.velero }}
+
+---
+apiVersion: helm.m.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: {{ $v.releaseName }}
+  annotations:
+    {{ setResourceNameAnnotation "helm-release-velero" }}
+  labels: {{ $v.labels | toJson }}
+spec:
+  managementPolicies: {{ $v.managementPolicies | toJson }}
+  forProvider:
+    chart:
+      name: velero
+      repository: https://vmware-tanzu.github.io/helm-charts
+      version: 11.3.2
+    namespace: {{ $v.namespace }}
+    {{- if $v.overrideAllValues }}
+    values:
+      {{- toYaml $v.overrideAllValues | nindent 6 }}
+    {{- else }}
+    values:
+      fullnameOverride: velero
+      nameOverride: velero
+      {{- if $v.values }}
+      {{- toYaml $v.values | nindent 6 }}
+      {{- end }}
+    {{- end }}
+  rollbackLimit: 3
+  providerConfigRef:
+    name: {{ $v.providerConfigRef.name }}
+    kind: {{ $v.providerConfigRef.kind }}

@@ -1,0 +1,36 @@
+apiVersion: helm.hops.ops.com.ai/v1alpha1
+kind: Velero
+metadata:
+  name: velero
+  namespace: example-env
+spec:
+  clusterName: example-cluster
+  labels:
+    team: platform
+  namespace: velero
+  values:
+    configuration:
+      backupStorageLocation:
+        - name: default
+          provider: aws
+          bucket: my-velero-backups
+          config:
+            region: us-east-1
+      volumeSnapshotLocation:
+        - name: default
+          provider: aws
+          config:
+            region: us-east-1
+    credentials:
+      useSecret: true
+      secretContents:
+        cloud: |
+          [default]
+          aws_access_key_id=<ACCESS_KEY>
+          aws_secret_access_key=<SECRET_KEY>
+    initContainers:
+      - name: velero-plugin-for-aws
+        image: velero/velero-plugin-for-aws:v1.10.0
+        volumeMounts:
+          - mountPath: /target
+            name: plugins
