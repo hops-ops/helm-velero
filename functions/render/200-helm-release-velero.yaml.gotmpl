@@ -2,6 +2,10 @@
 #
 # Helm release for Velero
 #
+# Integration defaults:
+# - Prometheus metrics enabled for backup/restore monitoring
+# - ServiceMonitor created for Prometheus Operator discovery
+#
 
 {{- $v := $state.velero }}
 
@@ -28,6 +32,11 @@ spec:
     values:
       fullnameOverride: velero
       nameOverride: velero
+      # Prometheus metrics for backup/restore monitoring
+      metrics:
+        enabled: true
+        serviceMonitor:
+          enabled: true
       {{- if $v.values }}
       {{- toYaml $v.values | nindent 6 }}
       {{- end }}
