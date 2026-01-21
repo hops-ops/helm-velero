@@ -87,6 +87,13 @@ _items = [
                             name = "default"
                             kind = "ProviderConfig"
                         }
+                        # Disable storage features for e2e test - Velero requires
+                        # backup storage configuration to become ready in production
+                        values = {
+                            backupsEnabled = False
+                            snapshotsEnabled = False
+                            deployNodeAgent = False
+                        }
                     }
                 }
             ]
